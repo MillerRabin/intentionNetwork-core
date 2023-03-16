@@ -1,4 +1,5 @@
 import { send } from './sender.js';
+import { dispatchMessage } from './dispatcher.js';
 
 const gMsgHash = {};
 let cancelTime = 5000;
@@ -119,5 +120,6 @@ export default {
   parseMulti,
   toJSON,
   send,
-  setCancelTime
+  setCancelTime,
+  dispatchMessage
 }
