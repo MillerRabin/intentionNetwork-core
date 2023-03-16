@@ -1,0 +1,27 @@
+{
+  "name": "@intention-network/messages",
+  "version": "0.0.1",
+  "description": "Messages for intention network",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MillerRabin/intentionNetwork-messages"
+  },
+  "author": "millerrabin",
+  "license": "ISC",
+  "homepage": "https://github.com/MillerRabin/intentionNetwork-messages",
+  "devDependencies": {
+    "mocha": "^10.2.0"
+  },
+  "bugs": {
+    "url": "https://github.com/MillerRabin/intentionNetwork-messages/issues"
+  },
+  "keywords": [
+    "intention",
+    "network"
+  ]
+}
