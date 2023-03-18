@@ -33,8 +33,8 @@ function getEffectiveChunkSize(id, chunkSize) {
   return chunkSize - (id.byteLength + 12);
 }
 
-export function send(channel, message, chunkSize = 65535) {
-  const enc = new TextEncoder();
+function sendStreaming(channel, message, chunkSize = 65535){
+ const enc = new TextEncoder();
   const data = enc.encode(message);
   let index = 0;
   const buffer = allocateBuffer(chunkSize);
@@ -51,6 +51,22 @@ export function send(channel, message, chunkSize = 65535) {
     const bw = new Uint8Array(buffer.buffer, 0, eLength);
     channel.send(bw);
   }
+}
+
+function canSendAsIs(mode) {
+  const lmode = mode.toLowerCase();
+  if (lmode.toLowerCase() == 'json')
+    return true;
+  if (lmode.toLowerCase() == 'binary')
+    return false;
+  throw new Error(`Invalid mode ${mode}. Must be json or binary`);
+}
+
+export function send({ channel, message, mode = 'json', chunkSize = 65535 }) {
+  if (canSendAsIs(mode)) 
+    return channel.send(message);
+  else
+    return sendStreaming(channel, message, chunkSize); 
 }
 
 export default { 

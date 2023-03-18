@@ -15,19 +15,17 @@ function getHeader(message) {
   return  { id, buffer, length, start, end }
 }
 
-export function parseMulti(message) {
+function parseStreaming(message) {
   const header = getHeader(message);
   const msg = getMessage(header);
   checkMessage(msg);
   return msg.ready;
 }
 
-export function parseSingle(message) {
-  const header = getHeader(message);
-  const msg = createMessage(header.length);  
-  const b8 = new Uint8Array(header.buffer);
-  msg.buffer.set(b8, header.start);
-  return msg.buffer
+export function parse(message) {
+  const res = tryJSON(message);
+  if (res != null) return message;
+  return parseStreaming(message);
 }
 
 function createMessage(length) {
@@ -87,6 +85,14 @@ function toJSON(data) {
   return JSON.parse(message);
 }
 
+function tryJSON(message) {
+  try {
+    return JSON.parse(message)
+  } catch (e) {
+    return null
+  }
+}
+
 
 function getMessage({id, buffer, length, start, end}) {
   if (gMsgHash[id] == null) {
@@ -116,8 +122,7 @@ export function setCancelTime(value) {
 }
 
 export default {
-  parseSingle, 
-  parseMulti,
+  parse,
   toJSON,
   send,
   setCancelTime,

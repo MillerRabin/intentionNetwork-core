@@ -137,6 +137,10 @@ function parseStatusMessage(storageLink, message) {
   return { message, intention, result: rObj };
 }
 
+function isStream(message) {
+
+}
+
 
 async function parseMessage(storageLink, message) {
   const pStatus = parseStatusMessage(storageLink, message);
