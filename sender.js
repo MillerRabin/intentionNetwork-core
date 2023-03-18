@@ -25,12 +25,12 @@ function setBufferId(buffer) {
 
 function getChunkSize(data, offset, chunkSize) {
   const left = data.byteLength - offset;
-  const eChunkSize = getEffectiveChunkSize(chunkSize);
+  const eChunkSize = chunkSize - getHeaderSize(chunkSize);
   return (left > eChunkSize) ? eChunkSize : left;
 }
 
-function getEffectiveChunkSize(id, chunkSize) {
-  return chunkSize - (id.byteLength + 12);
+function getHeaderSize() {
+  return (16 + 12); //uuid size + offset
 }
 
 function sendStreaming(channel, message, chunkSize = 65535){

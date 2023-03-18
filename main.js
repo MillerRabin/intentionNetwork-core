@@ -36,7 +36,6 @@ function createMessage(length) {
 };
 }
 
-
 function renewCancelTimeout(msgData) {
   if (msgData.cancelTimeout != null) clearTimeout(msgData.cancelTimeout);
   msgData.cancelTimeout = setTimeout(function () {
