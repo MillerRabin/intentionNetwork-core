@@ -4,7 +4,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getID() {
+function getId() {
   return new Uint32Array([getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF)]);
 }
 
@@ -14,7 +14,7 @@ function allocateBuffer(chunkSize) {
 
 function setBufferId(buffer) {
   try {
-      const id = getID();
+      const id = getId();
       const header = new Uint8Array(id.buffer);
       buffer.set(header, 0);
       return id.byteLength;
