@@ -19,21 +19,21 @@ const gCommandTable = {
           await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId, result});
       } catch (e) {
           if (e instanceof Error) return;
-          sendStatus({storageLink, status: 'FAILED', requestId: e.requestId, result: e});
+          await sendStatus({storageLink, status: 'FAILED', requestId: e.requestId, result: e});
       }
   },
   '1:ping': async function (storageLink) {
-      storageLink.sendObject({
+      await storageLink.sendObject({
           command: 'pong',
           version: 1
       });
   },
   '1:pong': async function (storageLink) {
-      storageLink.setAlive();
+      await storageLink.setAlive();
   },
   '1:requestStatus':  async function (storageLink, message) {
      try {
-          NetworkIntention.updateRequestObject(message);
+          await NetworkIntention.updateRequestObject(message);
      } catch (e) {}
   },
   '1:getAccepted':  async function (storageLink, message) {
@@ -42,7 +42,7 @@ const gCommandTable = {
           const accepted = mData.intention.accepted;
           await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId, result: accepted.toObject() });
       } catch (e) {
-          parseError(storageLink, e);
+          await parseError(storageLink, e);
       }
   },
   '1:setAccepted':  async function (storageLink, message) {
@@ -51,7 +51,7 @@ const gCommandTable = {
           mData.intention.accepted.set(mData.target);
           await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
       } catch (e) {
-          parseError(storageLink, e);
+          await parseError(storageLink, e);
       }
   },
   '1:deleteAccepted':  async function (storageLink, message) {
@@ -63,14 +63,14 @@ const gCommandTable = {
           mData.intention.send('close', mData.target, message.data);
           await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
       } catch (e) {
-          parseError(storageLink, e);
+          await parseError(storageLink, e);
       }
   },
 };
 
-function parseError(storageLink, e) {
+async function parseError(storageLink, e) {
   if (e instanceof Error) return;
-  sendStatus({storageLink, status: 'FAILED', requestId: e.requestId, result: e}).catch(() => {});
+  await sendStatus({storageLink, status: 'FAILED', requestId: e.requestId, result: e}).catch(() => {});
 }
 
 function parseUrl(url) {
@@ -85,12 +85,12 @@ async function getStorageLink(textIntention, storageLink) {
   const sUrl = storageLink.key;
   if ((storageLink.socket == null) || (tUrl == null) || (tUrl == sUrl)) return storageLink;
   const params = parseUrl(tUrl);
-  const link = storageLink.storage.addStorage({ ...params, handling: 'auto' });
+  const link = await storageLink.storage.addStorage({ ...params, handling: 'auto' });
   try {
       await link.waitConnection(10000);
       return link;
   } catch (e) {
-      storageLink.storage.deleteStorage(link);
+      await storageLink.storage.deleteStorage(link);
       throw new Error(`Connection with ${tUrl} cat't be established`);
   }
 }
@@ -101,7 +101,7 @@ async function broadcast(storageLink, textIntention) {
   if (target != null) return target;
   textIntention.storageLink = await getStorageLink(textIntention, storageLink);
   const intention = new NetworkIntention(textIntention);
-  storageLink.storage.addNetworkIntention(intention);
+  await storageLink.storage.addNetworkIntention(intention);
   return intention;
 }
 
@@ -136,11 +136,6 @@ function parseStatusMessage(storageLink, message) {
       throwObject(rObj, 'Intention must be of type Intention');
   return { message, intention, result: rObj };
 }
-
-function isStream(message) {
-
-}
-
 
 async function parseMessage(storageLink, message) {
   const pStatus = parseStatusMessage(storageLink, message);

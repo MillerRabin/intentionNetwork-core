@@ -70,5 +70,5 @@ export function send({ channel, message, mode = 'json', chunkSize = 65535 }) {
 }
 
 export default { 
-  send
+  send, getId
 }
