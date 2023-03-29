@@ -97,7 +97,7 @@ async function getStorageLink(textIntention, storageLink) {
 
 async function broadcast(storageLink, textIntention) {
   if (textIntention.id == null) throw new Error('Intention id must exists');
-  const target =  storageLink.storage.intentions.byId(textIntention.id);
+  const target = await storageLink.storage.intentions.byId(textIntention.id);
   if (target != null) return target;
   textIntention.storageLink = await getStorageLink(textIntention, storageLink);
   const intention = new NetworkIntention(textIntention);
