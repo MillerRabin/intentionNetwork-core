@@ -121,13 +121,13 @@ function throwObject(rObj, message) {
   throw rObj;
 }
 
-function parseStatusMessage(storageLink, message) {
+async function parseStatusMessage(storageLink, message) {
   const rObj = { messages: [] };
   rObj.requestId = message.requestId;
   if (rObj.requestId == null) rObj.messages.push('requestId field must exists');
   rObj.id = message.id;
   if (rObj.id == null) throwObject(rObj, 'Intention id field must exists');
-  const intention = storageLink.storage.intentions.byId(rObj.id);
+  const intention = await storageLink.storage.intentions.byId(rObj.id);
   if (intention == null) {
       rObj.operation = 'delete';
       throwObject(rObj, 'The Intention is not found at the origin')
@@ -138,7 +138,7 @@ function parseStatusMessage(storageLink, message) {
 }
 
 async function parseMessage(storageLink, message) {
-  const pStatus = parseStatusMessage(storageLink, message);
+  const pStatus = await parseStatusMessage(storageLink, message);
   if (message.status == null) pStatus.result.messages.push('message status field must exists');
   if (message.intention == null)
       throwObject(pStatus.result, 'intention field must exists');
