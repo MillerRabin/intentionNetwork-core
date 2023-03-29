@@ -38,7 +38,7 @@ const gCommandTable = {
   },
   '1:getAccepted':  async function (storageLink, message) {
       try {
-          const mData = parseStatusMessage(storageLink, message);
+          const mData = await parseStatusMessage(storageLink, message);
           const accepted = mData.intention.accepted;
           return await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId, result: accepted.toObject() });
       } catch (e) {
