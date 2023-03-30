@@ -1,5 +1,3 @@
-import sender from './sender.js';
-
 const gCommandTable = {
   '1:broadcast':  async function (storageLink, message) {
       if (message.intention == null) throw new Error('intention object expected');
@@ -57,7 +55,7 @@ const gCommandTable = {
   '1:deleteAccepted':  async function (storageLink, message) {
       try {
           const mData = parseStatusMessage(storageLink, message);
-          mData.target = storageLink.storage.intentions.byId(message.intention);
+          mData.target = storageLink.storage.intentions.byId(mData.intention.id);
           if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
           mData.intention.accepted.delete(message.data);
           mData.intention.send('close', mData.target, message.data);
@@ -99,7 +97,7 @@ async function broadcast(storageLink, textIntention) {
   if (textIntention.id == null) throw new Error('Intention id must exists');
   const target = await storageLink.storage.intentions.byId(textIntention.id);
   if (target != null) return target;
-  textIntention.storageLink = await getStorageLink(textIntention, storageLink);  
+  textIntention.storage = await getStorageLink(textIntention, storageLink);  
   const intention = await storageLink.storage.addNetworkIntention(textIntention);
   return intention;
 }
