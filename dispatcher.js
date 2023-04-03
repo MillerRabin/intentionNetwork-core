@@ -46,7 +46,7 @@ const gCommandTable = {
   '1:setAccepted':  async function (storageLink, message) {
       try {
           const mData = await parseMessage(storageLink, message);
-          mData.intention.accepted.set(mData.target);
+          await mData.intention.accepted.set(mData.target);
           return await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
       } catch (e) {
           return await parseError(storageLink, e);
@@ -57,7 +57,7 @@ const gCommandTable = {
           const mData = await parseStatusMessage(storageLink, message);
           mData.target = storageLink.storage.intentions.byId(mData.intention.id);
           if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
-          mData.intention.accepted.delete(message.data);
+          await mData.intention.accepted.delete(message.data);
           mData.intention.send('close', mData.target, message.data);
           await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
       } catch (e) {
