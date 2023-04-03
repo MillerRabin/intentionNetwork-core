@@ -20,7 +20,7 @@ const gCommandTable = {
         throwObject(mData.result, e.message);
       }      
     } catch (e) {      
-      return await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: se });
+      return await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: e });
     }
   },
   '1:ping': async function (storageLink) {
