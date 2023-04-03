@@ -110,9 +110,9 @@ const gCommandTable = {
   }
 };
 
-async function parseError(storageLink, e) {
-  if (e instanceof Error) return;
+async function parseError(storageLink, e) {  
   await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: e }).catch(() => { });
+  throw e;
 }
 
 function parseUrl(url) {
