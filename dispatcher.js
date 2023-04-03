@@ -54,7 +54,7 @@ const gCommandTable = {
   },
   '1:deleteAccepted':  async function (storageLink, message) {
       try {
-          const mData = parseStatusMessage(storageLink, message);
+          const mData = await parseStatusMessage(storageLink, message);
           mData.target = storageLink.storage.intentions.byId(mData.intention.id);
           if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
           mData.intention.accepted.delete(message.data);
