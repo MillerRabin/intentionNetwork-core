@@ -157,24 +157,33 @@ async function sendStatus({ storageLink, status, requestId, result }) {
   });
 }
 
-function throwObject(rObj, message) {
+function throwObject(rObj, message, operation) {
   rObj.messages.push(message);
+  rObj.operation = operation;
   throw rObj;
 }
 
 async function parseStatusMessage(storageLink, message) {
   const rObj = { messages: [], requestId: message.requestId };  
-  if (rObj.requestId == null) rObj.messages.push('requestId field must exists');
-  rObj.id = message.id;
-  if (rObj.id == null) throwObject(rObj, 'Intention id field must exists');
-  const intention = await storageLink.storage.intentions.byId(rObj.id);
-  if (intention == null) {
-    rObj.operation = 'delete';
-    throwObject(rObj, 'The Intention is not found at the origin')
+  if (rObj.requestId == null)
+    throw new Error('requestId field must exists');
+  try {
+    rObj.id = message.id;
+    if (rObj.id == null) 
+      throw new Error('Intention id field must exists');
+    const intention = await storageLink.storage.intentions.byId(rObj.id);  
+    if (intention == null) {    
+      const err = new Error('The Intention is not found at the origin');
+      err.operation = 'delete';
+      throw err;
+    }
+    if (intention.type != 'Intention')
+      throw new Error('Intention must be of type Intention');
+    return { message, intention, result: rObj };
+  } catch (e) {
+    throwObject(rObj, e.message, e.operation);
   }
-  if (intention.type != 'Intention')
-    throwObject(rObj, 'Intention must be of type Intention');
-  return { message, intention, result: rObj };
+  
 }
 
 async function parseMessage(storageLink, message) {
