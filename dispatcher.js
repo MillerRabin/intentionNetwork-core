@@ -188,13 +188,18 @@ async function parseStatusMessage(storageLink, message) {
 
 async function parseMessage(storageLink, message) {
   const pStatus = await parseStatusMessage(storageLink, message);
-  if (message.status == null) pStatus.result.messages.push('message status field must exists');
-  if (message.intention == null)
-    throwObject(pStatus.result, 'intention field must exists');
-  pStatus.target = await broadcast(storageLink, message.intention);
-  if (pStatus.target == null)
-    throwObject(pStatus.result, 'Intention is not found');
-  return pStatus;
+  try {
+    if (message.status == null) pStatus.result.messages.push('message status field must exists');
+    if (message.intention == null)
+      throw new Error('intention field must exists');
+    pStatus.target = await broadcast(storageLink, message.intention);
+    if (pStatus.target == null)
+      throw new Error('Intention is not found');
+    return pStatus;
+  } catch (e) {
+    throwObject(pStatus.result, e.message, e.operation)
+  }
+  
 }
 
 
