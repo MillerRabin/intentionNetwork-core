@@ -13,10 +13,13 @@ const gCommandTable = {
   '1:message': async function (storageLink, message) {
     try {
       const mData = await parseMessage(storageLink, message);
-      const result = await mData.intention.send(message.status, mData.target, message.data);
-      return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId, result });
-    } catch (e) {
-      const se = (e instanceof Error) ? [e.message] : e;
+      try {
+        const result = await mData.intention.send(message.status, mData.target, message.data);
+        return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId, result });
+      } catch(e) {
+        throwObject(mData.result, e.message);
+      }      
+    } catch (e) {      
       return await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: se });
     }
   },
@@ -37,8 +40,12 @@ const gCommandTable = {
   '1:getAccepted': async function (storageLink, message) {
     try {
       const mData = await parseStatusMessage(storageLink, message);
-      const accepted = mData.intention.accepted;
-      return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId, result: accepted.toObject() });
+      try {
+        const accepted = mData.intention.accepted;
+        return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId, result: accepted.toObject() });
+      } catch (e) {
+        throwObject(mData.result, e.message);
+      }      
     } catch (e) {
       return await parseError(storageLink, e);
     }
@@ -46,8 +53,12 @@ const gCommandTable = {
   '1:setAccepting': async function (storageLink, message) {
     try {
       const mData = await parseMessage(storageLink, message);
-      await mData.intention.accepted.setAccepting(mData.target);
-      return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      try {
+        await mData.intention.accepted.setAccepting(mData.target);
+        return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      } catch (e) {
+        throwObject(mData.result, e.message);
+      }      
     } catch (e) {
       return await parseError(storageLink, e);
     }
@@ -55,20 +66,28 @@ const gCommandTable = {
   '1:setAccepted': async function (storageLink, message) {
     try {
       const mData = await parseMessage(storageLink, message);
-      await mData.intention.accepted.setAccepted(mData.target);
-      return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      try {
+        await mData.intention.accepted.setAccepted(mData.target);
+        return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      } catch (e) {
+        throwObject(mData.result, e.message);
+      }      
     } catch (e) {
       return await parseError(storageLink, e);
     }
   },
   '1:deleteAccepting': async function (storageLink, message) {
     try {
-      const mData = await parseStatusMessage(storageLink, message);
+      const mData = await parseStatusMessage(storageLink, message);  
       mData.target = await storageLink.storage.intentions.byId(mData.intention.id);
       if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
-      await mData.intention.accepted.deleteAccepting(mData.target);
-      await mData.intention.send('close', mData.target, message.data);
-      await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      try {        
+        await mData.intention.accepted.deleteAccepting(mData.target);
+        await mData.intention.send('close', mData.target, message.data);
+        await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      } catch (e) {
+        throwObject(mData.result, e.message);
+      }        
     } catch (e) {
       await parseError(storageLink, e);
     }
@@ -78,9 +97,13 @@ const gCommandTable = {
       const mData = await parseStatusMessage(storageLink, message);
       mData.target = await storageLink.storage.intentions.byId(mData.intention.id);
       if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
-      await mData.intention.accepted.deleteAccepted(mData.target, message.data);
-      await mData.intention.send('close', mData.target, message.data);
-      await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      try {        
+        await mData.intention.accepted.deleteAccepted(mData.target, message.data);
+        await mData.intention.send('close', mData.target, message.data);
+        await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId });
+      } catch (e) {
+        throwObject(mData.result, e.message);
+      }
     } catch (e) {
       await parseError(storageLink, e);
     }
@@ -124,7 +147,7 @@ async function broadcast(storageLink, textIntention) {
 }
 
 async function sendStatus({ storageLink, status, requestId, result }) {
-  if (requestId == null) throw new Error({ message: 'requestId is null', ...result });
+  if (requestId == null) throw new Error('requestId is null');
   return await storageLink.sendObject({
     command: 'requestStatus',
     version: 1,
@@ -140,8 +163,7 @@ function throwObject(rObj, message) {
 }
 
 async function parseStatusMessage(storageLink, message) {
-  const rObj = { messages: [] };
-  rObj.requestId = message.requestId;
+  const rObj = { messages: [], requestId: message.requestId };  
   if (rObj.requestId == null) rObj.messages.push('requestId field must exists');
   rObj.id = message.id;
   if (rObj.id == null) throwObject(rObj, 'Intention id field must exists');
