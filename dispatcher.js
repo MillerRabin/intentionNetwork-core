@@ -63,14 +63,14 @@ const gCommandTable = {
   },
   '1:deleteAccepting':  async function (storageLink, message) {
       try {
-          const mData = await parseStatusMessage(storageLink, message);
-          mData.target = await storageLink.storage.intentions.byId(mData.intention.id);
-          if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
-          await mData.intention.accepted.deleteAccepting(message.data);
-          mData.intention.send('close', mData.target, message.data);
-          await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
+        const mData = await parseStatusMessage(storageLink, message);
+        mData.target = await storageLink.storage.intentions.byId(mData.intention.id);
+        if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
+        await mData.intention.accepted.deleteAccepting(mData.target);
+        await mData.intention.send('close', mData.target, message.data);
+        await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
       } catch (e) {
-          await parseError(storageLink, e);
+        await parseError(storageLink, e);
       }
   },
   '1:deleteAccepted':  async function (storageLink, message) {
@@ -78,8 +78,8 @@ const gCommandTable = {
         const mData = await parseStatusMessage(storageLink, message);
         mData.target = await storageLink.storage.intentions.byId(mData.intention.id);
         if (mData.target == null) throwObject(mData.result, 'Target intention is not found');
-        await mData.intention.accepted.deleteAccepted(message.data);
-        mData.intention.send('close', mData.target, message.data);
+        await mData.intention.accepted.deleteAccepted(mData.target, message.data);
+        await mData.intention.send('close', mData.target, message.data);
         await sendStatus({storageLink, status: 'OK', requestId: mData.result.requestId });
     } catch (e) {
         await parseError(storageLink, e);
