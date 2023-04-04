@@ -19,8 +19,8 @@ const gCommandTable = {
       } catch(e) {
         throwObject(mData.result, e.message);
       }      
-    } catch (e) {      
-      return await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: e });
+    } catch (e) {            
+      return await parseError(storageLink, e);
     }
   },
   '1:ping': async function (storageLink) {
@@ -111,7 +111,7 @@ const gCommandTable = {
 };
 
 async function parseError(storageLink, e) {  
-  await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: e }).catch(() => { });
+  await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: e }).catch(() => {});
   throw e;
 }
 
