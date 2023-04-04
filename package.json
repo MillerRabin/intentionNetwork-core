@@ -1,6 +1,6 @@
 {
   "name": "@intention-network/messages",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "Messages for intention network",
   "main": "main.js",
   "type": "module",

@@ -1,5 +1,6 @@
 import { send } from './sender.js';
 import { dispatchMessage } from './dispatcher.js';
+import { mapValueToInterface } from './interface.js';
 
 const gMsgHash = {};
 let cancelTime = 5000;
@@ -125,5 +126,6 @@ export default {
   toJSON,
   send,
   setCancelTime,
-  dispatchMessage
+  dispatchMessage,
+  mapValueToInterface
 }
