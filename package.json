@@ -1,7 +1,7 @@
 {
-  "name": "@intention-network/messages",
-  "version": "0.0.25",
-  "description": "Messages for intention network",
+  "name": "@intention-network/core",
+  "version": "0.0.1",
+  "description": "Intention Network core",
   "main": "main.js",
   "type": "module",
   "scripts": {

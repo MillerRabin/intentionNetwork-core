@@ -2,8 +2,7 @@ async function dispatch(to, from, command, schema, data) {
   const res = await to.send('data', from, {
     command,
     data
-  });
-  console.log(res);
+  });  
   return res;
 }
 

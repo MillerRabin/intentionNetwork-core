@@ -1,6 +1,7 @@
 import { send } from './sender.js';
 import { dispatchMessage } from './dispatcher.js';
 import { mapValueToInterface } from './interface.js';
+import IntentionStorage from './IntentionStorage.js';
 
 const gMsgHash = {};
 let cancelTime = 5000;
@@ -127,5 +128,6 @@ export default {
   send,
   setCancelTime,
   dispatchMessage,
-  mapValueToInterface
+  mapValueToInterface,
+  IntentionStorage
 }
