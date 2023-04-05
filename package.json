@@ -9,16 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MillerRabin/intentionNetwork-messages"
+    "url": "git+https://github.com/MillerRabin/intentionNetwork-core"
   },
   "author": "millerrabin",
   "license": "ISC",
-  "homepage": "https://github.com/MillerRabin/intentionNetwork-messages",
+  "homepage": "https://github.com/MillerRabin/intentionNetwork-core",
   "devDependencies": {
     "mocha": "^10.2.0"
   },
   "bugs": {
-    "url": "https://github.com/MillerRabin/intentionNetwork-messages/issues"
+    "url": "https://github.com/MillerRabin/intentionNetwork-core/issues"
   },
   "keywords": [
     "intention",
