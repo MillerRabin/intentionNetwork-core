@@ -76,14 +76,15 @@ export default class NetworkIntention extends IntentionAbstract {
     if (message.requestId == null) throw new Error('message requestId is null');
     const request = gRequestTransactions[message.requestId];
     if (request == null) {
-      console.log(`request is not found: ${message.requestId}`);
+      console.error(`request is not found: ${message.requestId}`);
       return;
     }
     if (message.status != 'FAILED') {
-      request.resolve(message.result);
-      return;
+      clearTimeout(request.timeout);
+      return request.resolve(message.result);      
     }
-    request.reject(message.result);
+    clearTimeout(request.timeout);
+    return request.reject(message.result);
   }
 
   get origin() {

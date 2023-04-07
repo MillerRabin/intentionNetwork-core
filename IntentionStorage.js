@@ -88,7 +88,7 @@ export default class IntentionStorage {
   async observe(modules) {
     const conns = await this.#storageInterface.getStorageLinks({ storageId: this.id });    
     if (conns.length == 0) return;    
-    const intentions = await this.#storageInterface.getAcceptReady();
+    const intentions = await this.#storageInterface.getAcceptReady({ storageId: this.id });
     if (intentions.length == 0) return;    
     const sourceInt = intentions.map(i => i.source);
     const promises = [];
