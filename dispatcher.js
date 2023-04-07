@@ -1,5 +1,5 @@
 
-import NetworkIntention from "./NetworkIntention";
+import NetworkIntention from "./NetworkIntention.js";
 
 const gCommandTable = {
   '1:broadcast': async function (storageLink, message) {
