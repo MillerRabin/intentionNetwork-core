@@ -1,3 +1,6 @@
+
+import NetworkIntention from "./NetworkIntention";
+
 const gCommandTable = {
   '1:broadcast': async function (storageLink, message) {
     if (message.intention == null) throw new Error('intention object expected');
@@ -35,7 +38,9 @@ const gCommandTable = {
   '1:requestStatus': async function (storageLink, message) {
     try {
       return await NetworkIntention.updateRequestObject(message);
-    } catch (e) { }
+    } catch (e) {
+      console.error('RequestStatusError', e);
+    }
   },
   '1:getAccepted': async function (storageLink, message) {
     try {
