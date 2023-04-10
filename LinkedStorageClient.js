@@ -46,6 +46,10 @@ export default class StorageLink {
     })
   }
 
+  async deleteIntention(networkIntention) {
+    return await this.#storage.deleteIntention(networkIntention.id); 
+  }
+
   get id() {    
     if (this.#id != null) return this.#id;
     if (this.#schema == null)

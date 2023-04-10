@@ -1,6 +1,6 @@
-import safe from "./core/safe.mjs";
+import safe from "./core/safe.js";
 import AcceptedIntentions from "./AcceptedIntentions.js";
-import uuid from "./core/uuid.mjs";
+import uuid from "./core/uuid.js";
 
 export default class IntentionAbstract {
   #createTime = new Date();

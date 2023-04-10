@@ -1,12 +1,4 @@
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getId() {
-  return new Uint32Array([getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF)]);
-}
+import uuid from "./core/uuid.js";
 
 function allocateBuffer(chunkSize) {
   return new Uint8Array(chunkSize);
@@ -14,7 +6,7 @@ function allocateBuffer(chunkSize) {
 
 function setBufferId(buffer) {
   try {
-      const id = getId();
+      const id = uuid.generate();
       const header = new Uint8Array(id.buffer);
       buffer.set(header, 0);
       return id.byteLength;
@@ -70,5 +62,5 @@ export function send({ channel, message, mode = 'json', chunkSize = 65535 }) {
 }
 
 export default { 
-  send, getId
+  send
 }

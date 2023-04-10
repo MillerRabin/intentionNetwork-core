@@ -1,20 +1,11 @@
-import safe from "./core/safe.mjs";
-import uuid from "./core/uuid.mjs";
+import safe from "./core/safe.js";
 import IntentionAbstract from "./IntentionAbstract.js";
-
-const gRequestTransactions = {};
-
-async function processError(networkIntention, error) {
-  const id = error.id;
-  const operation = error.operation;
-  if ((id == null) || (operation == null)) return;
-  if (operation == 'delete')
-    await networkIntention.storage.storage.deleteIntention(networkIntention.id);
-}
+import IntentionRequest from "./IntentionRequest.js";
 
 export default class NetworkIntention extends IntentionAbstract {
   #origin;  
   #type = 'NetworkIntention';
+  #request = new IntentionRequest(this);
   #messageTimeout = 30000;
   
   constructor({
@@ -41,52 +32,6 @@ export default class NetworkIntention extends IntentionAbstract {
     this.#messageTimeout = messageTimeout ?? this.#messageTimeout;
   }
 
-  static createRequestObject(networkIntention, intention, data) {
-    const requestId = uuid.generate();
-    const request = { intention, id: requestId };
-    request.promise = new Promise((resolve, reject) => {
-      request.resolve = resolve;
-      request.reject = reject;
-      request.timeout = setTimeout(() => {
-        reject({ message: `Request ${requestId} time is out`, data });
-        NetworkIntention.deleteRequestObject(requestId);
-      }, networkIntention.messageTimeout);
-    }).then((result) => {
-      NetworkIntention.deleteRequestObject(requestId);
-      return result;
-    }).catch((error) => {
-      NetworkIntention.deleteRequestObject(requestId);
-      processError(networkIntention, error);
-      throw error;
-    });
-    gRequestTransactions[requestId] = request;
-    return request;
-  }
-
-  static deleteRequestObject(requestId, error) {
-    if (gRequestTransactions[requestId] == null) return;
-    clearTimeout(gRequestTransactions[requestId].timeout);
-    error = (error == null) ? new Error(`Request ${requestId} is deleted`) : error;
-    const req = gRequestTransactions[requestId];
-    delete gRequestTransactions[requestId];
-    req.reject(error);
-  }
-
-  static updateRequestObject(message) {
-    if (message.requestId == null) throw new Error('message requestId is null');
-    const request = gRequestTransactions[message.requestId];
-    if (request == null) {
-      console.error(`request is not found: ${message.requestId}`);
-      return;
-    }
-    if (message.status != 'FAILED') {
-      clearTimeout(request.timeout);
-      return request.resolve(message.result);      
-    }
-    clearTimeout(request.timeout);
-    return request.reject(message.result);
-  }
-
   get origin() {
     return this.#origin;
   }
@@ -97,7 +42,7 @@ export default class NetworkIntention extends IntentionAbstract {
 
   send(status, intention, data) {
     if (intention.toObject == null) throw new Error('Intention must not be null');
-    const request = NetworkIntention.createRequestObject(this, intention);
+    const request = this.#request.create(this, intention);
     try {
       this.storage.sendObject({
         command: 'message',
@@ -110,7 +55,7 @@ export default class NetworkIntention extends IntentionAbstract {
       });
       return request.promise;
     } catch (e) {
-      NetworkIntention.deleteRequestObject(request.id, e);
+      this.#request.delete(request.id, e);
       return request.promise;
     }
   }
@@ -120,7 +65,7 @@ export default class NetworkIntention extends IntentionAbstract {
   }
 
   async sendCommand(intention, command, data) {
-    const request = NetworkIntention.createRequestObject(this, intention, data);
+    const request = this.#request.create(this, intention, data);
     const iObj = (intention.toObject == null) ? intention : intention.toObject();
     try {
       await this.storage.sendObject({
@@ -133,7 +78,7 @@ export default class NetworkIntention extends IntentionAbstract {
       });
       return request.promise;
     } catch (e) {
-      NetworkIntention.deleteRequestObject(request.id, e);
+      this.#request.delete(request.id, e);
       return request.promise;
     }
   }
