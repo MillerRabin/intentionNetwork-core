@@ -69,7 +69,6 @@ export class IntentionInterface {
 }
 
 
-export default {
-  mapValueToInterface,
+export default {  
   IntentionInterface
 }
