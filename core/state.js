@@ -1,4 +1,4 @@
-export function createPromiseState({
+export default function createPromiseState({
   message = 'Time is out', 
   rejectTimeout = 120000
 }) {  
