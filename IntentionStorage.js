@@ -7,6 +7,12 @@ export default class IntentionStorage {
   #storageInterface;
   #intentions;
   #storageLinks = new Map();
+  #createLinkedStorage(params) {
+    params.storage = this;
+    if (params.handling == null)
+      params.handling = 'manual';
+    return new LinkedStorageClient(params);    
+  }
 
   constructor(id, storageInterface) {
     if (id == null) throw new Error('id is expected');
@@ -21,11 +27,7 @@ export default class IntentionStorage {
   get intentions() { return this.#intentions; }
 
   async addStorage(params) {
-    params.storage = this;
-    if (params.handling == null)
-      params.handling = 'manual';
-
-    const linkedStorage = new LinkedStorageClient(params);
+    const linkedStorage = this.#createLinkedStorage(params)
     await this.#storageInterface.addLinkedStorage(linkedStorage);
     this.#storageLinks.set(linkedStorage.id, linkedStorage);
     return linkedStorage;
@@ -74,7 +76,8 @@ export default class IntentionStorage {
     const { channel, storage } = modules;    
     try {
       const chn = new channel.Channel({ requestContext: { endpoint: connection.endpoint }}, connection.id, storage);      
-      const storageLink = await this.addStorage({ channel: chn });
+      const storageLink = this.#createLinkedStorage({ channel: chn });
+      await storageLink.ping();
       const promises = [...intentions.map(i => storageLink.broadcast(i))];            
       const res = await Promise.allSettled(promises);                
       return res;      
@@ -86,13 +89,9 @@ export default class IntentionStorage {
   }
   async observe(modules) {
     const conns = await this.#storageInterface.getBroadcastReady({ storageId: this.id });
-    if (conns.length == 0) {
-      console.log('No connection to observe');
-      return;
-    }
+    if (conns.length == 0) return;
     const promises = [...conns.map(c => this.broadcast(modules, c, c.intentions))];
-    const res = await Promise.allSettled(promises);
-    console.log('observe', res);
+    return await Promise.allSettled(promises);    
   }
 
 }
