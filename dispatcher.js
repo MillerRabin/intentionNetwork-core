@@ -38,7 +38,7 @@ const gCommandTable = {
   },
   '1:requestStatus': async function (storageLink, message) {
     try {
-      return await intentionRequest.updateRequestObject(message);
+      return await intentionRequest.update(message);
     } catch (e) {
       console.error('RequestStatusError', e);
     }
