@@ -84,15 +84,13 @@ export default class IntentionStorage {
       throw e;
     }
   }
-
   async observe(modules) {
-    const conns = await this.#storageInterface.getStorageLinks({ storageId: this.id });    
-    if (conns.length == 0) return;    
-    const intentions = await this.#storageInterface.getAcceptReady({ storageId: this.id });
-    if (intentions.length == 0) return;    
-    const sourceInt = intentions.map(i => i.source);
-    const promises = [];
-    promises.push(...conns.map(c => this.broadcast(modules, c, sourceInt)));
+    const conns = await this.#storageInterface.getBroadcastReady({ storageId: this.id });
+    if (conns.length == 0) {
+      console.log('No connection to observe');
+      return;
+    }
+    const promises = [...conns.map(c => this.broadcast(modules, c, c.intentions))];
     const res = await Promise.allSettled(promises);
     console.log('observe', res);
   }

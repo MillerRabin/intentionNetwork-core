@@ -9,7 +9,7 @@ async function dispatch(to, from, command, schema, data) {
 }
 
 
-export class IntentionInterface {
+export default class IntentionInterface {
   #statePromise = state.createPromiseState({ message: 'Interface connection time out'});
   #source;
 
@@ -66,9 +66,4 @@ export class IntentionInterface {
       input, output, title, description
     })
   }
-}
-
-
-export default {  
-  IntentionInterface
 }
