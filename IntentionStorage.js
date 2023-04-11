@@ -77,7 +77,6 @@ export default class IntentionStorage {
     try {
       const chn = new channel.Channel({ requestContext: { endpoint: connection.endpoint }}, connection.id, storage);      
       const storageLink = this.#createLinkedStorage({ channel: chn });
-      await storageLink.ping();
       const promises = [...intentions.map(i => storageLink.broadcast(i))];            
       const res = await Promise.allSettled(promises);                
       return res;      
