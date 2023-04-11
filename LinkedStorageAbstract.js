@@ -1,5 +1,4 @@
 import { version } from './config.js';
-import createPromiseState from './core/state.js';
 
 export default class LinkedStorageAbstract {
   #storage;
@@ -11,9 +10,7 @@ export default class LinkedStorageAbstract {
   #port;
   #origin;
   #schema;
-  #pingPromise
   
-
   constructor({ storage, channel, handling, id, endpoint, origin, port, schema }) {
     if (storage == null) throw new Error('Storage must be exists');
     if (handling == null) throw new Error('Manage type must be defined');
@@ -62,18 +59,4 @@ export default class LinkedStorageAbstract {
   async deleteIntention(networkIntention) {
     return await this.#storage.deleteIntention(networkIntention.id); 
   }
-
-  setAlive() {
-    if (this.#pingPromise != null)
-      this.#channel.pingPromise.setReady();
-  }
-
-  async ping() {
-    this.#pingPromise = pingPromise = createPromiseState({ message: 'Ping request', rejectTimeout: 5000 });    
-    await this.sendObject({
-      command: 'ping',
-      version
-    });
-    return this.#pingPromise.ready;
-  }  
 };
