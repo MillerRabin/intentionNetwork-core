@@ -1,6 +1,6 @@
 import safe from "./core/safe.js";
 import IntentionAbstract from "./IntentionAbstract.js";
-import intentionRequest from "./IntentionRequest.js";
+import intentionRequest from "./intentionRequest.js";
 
 export default class NetworkIntention extends IntentionAbstract {
   #origin;  
