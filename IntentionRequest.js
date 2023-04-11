@@ -10,7 +10,7 @@ async function processError(networkIntention, error) {
     await networkIntention.storage.deleteIntention(networkIntention.id);
 }
 
-class IntentionRequest {  
+export default class IntentionRequest {  
   #intention;
   constructor (intention) {
     this.#intention = intention;    
@@ -68,8 +68,4 @@ class IntentionRequest {
       this.delete(key);
     }
   }
-}
-
-export default {
-  IntentionRequest
 }
