@@ -1,7 +1,5 @@
 import uuid from "./core/uuid.js";
 
-const gRequestTransactions = new Map();
-
 async function processError(networkIntention, error) {
   const id = error.id;
   const operation = error.operation;
@@ -10,46 +8,44 @@ async function processError(networkIntention, error) {
     await networkIntention.storage.deleteIntention(networkIntention.id);
 }
 
-export default class IntentionRequest {  
-  #intention;
-  constructor (intention) {
-    this.#intention = intention;    
-  }
+class IntentionRequest {    
+  #requests = new Map();
+  constructor () {}
 
-  create(intention, data) {
+  create(source, intention, data) {
     const requestId = uuid.generate();
-    const request = { intention, id: requestId };
+    const request = { sourceId: source.id, intention, id: requestId };
     request.promise = new Promise((resolve, reject) => {
       request.resolve = resolve;
       request.reject = reject;
       request.timeout = setTimeout(() => {
         reject({ message: `Request ${requestId} time is out`, data });
         this.delete(requestId);
-      }, this.#intention.messageTimeout);
+      }, source.messageTimeout);
     }).then(result => {
       this.delete(requestId);
       return result;
     }).catch(error => {
       this.delete(requestId, error);
-      processError(this.#intention, error);
+      processError(source, error);
       throw error;
     });
-    gRequestTransactions.set(requestId, request);
+    this.#requests.set(requestId, request);
     return request;
   }
   
   delete(requestId, error) {    
-    const request = gRequestTransactions.get(requestId);
+    const request = this.#requests.get(requestId);
     if (request == null) return;
     clearTimeout(request.timeout);
     error = (error == null) ? new Error(`Request ${requestId} is deleted`) : error;
-    gRequestTransactions.delete(requestId);
+    this.#requests.delete(requestId);
     request.reject(error);
   }
   
   update(message) {
     if (message.requestId == null) throw new Error('message requestId is null');
-    const request = gRequestTransactions.get(message.requestId); 
+    const request = this.#requests.get(message.requestId); 
     if (request == null) {
       console.error(`request is not found: ${message.requestId}`);
       return;
@@ -64,8 +60,11 @@ export default class IntentionRequest {
   }
 
   clear() {
-    for (const [key] of gRequestTransactions) {
+    for (const [key] of this.#requests) {
       this.delete(key);
     }
   }
 }
+
+const intentionRequest = new IntentionRequest();
+export default intentionRequest;

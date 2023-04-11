@@ -1,11 +1,10 @@
 import safe from "./core/safe.js";
 import IntentionAbstract from "./IntentionAbstract.js";
-import IntentionRequest from "./IntentionRequest.js";
+import intentionRequest from "./IntentionRequest.js";
 
 export default class NetworkIntention extends IntentionAbstract {
   #origin;  
   #type = 'NetworkIntention';
-  #request = new IntentionRequest(this);
   #messageTimeout = 30000;
   
   constructor({
@@ -42,7 +41,7 @@ export default class NetworkIntention extends IntentionAbstract {
 
   send(status, intention, data) {
     if (intention.toObject == null) throw new Error('Intention must not be null');
-    const request = this.#request.create(this, intention);
+    const request = intentionRequest.create(this, intention);
     try {
       this.storage.sendObject({
         command: 'message',
@@ -55,7 +54,7 @@ export default class NetworkIntention extends IntentionAbstract {
       });
       return request.promise;
     } catch (e) {
-      this.#request.delete(request.id, e);
+      intentionRequest.delete(request.id, e);
       return request.promise;
     }
   }
@@ -65,7 +64,7 @@ export default class NetworkIntention extends IntentionAbstract {
   }
 
   async sendCommand(intention, command, data) {
-    const request = this.#request.create(this, intention, data);
+    const request = intentionRequest.create(this, intention, data);
     const iObj = (intention.toObject == null) ? intention : intention.toObject();
     try {
       await this.storage.sendObject({
@@ -78,7 +77,7 @@ export default class NetworkIntention extends IntentionAbstract {
       });
       return request.promise;
     } catch (e) {
-      this.#request.delete(request.id, e);
+      intentionRequest.delete(request.id, e);
       return request.promise;
     }
   }
