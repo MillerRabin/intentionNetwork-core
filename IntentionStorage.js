@@ -80,5 +80,12 @@ export default class IntentionStorage {
       await this.deleteStorage(connection.id);
       throw e;
     }
-  }  
+  }
+  
+  async observe(modules) {
+    const conns = await this.#storageInterface.getBroadcastReady({ storageId: this.id });
+    if (conns.length == 0) return;
+    const promises = [...conns.map(c => this.broadcast(modules, c, c.intentions))];
+    return await Promise.allSettled(promises);    
+  }
 }
