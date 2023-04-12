@@ -1,7 +1,6 @@
 
 import intentionRequest from "./intentionRequest.js";
 
-
 const gCommandTable = {
   '1:broadcast': async function (storageLink, message) {
     if (message.intention == null) throw new Error('intention object expected');
@@ -216,19 +215,6 @@ export async function dispatchMessage(storageLink, data) {
   return await func(storageLink, data);
 }
 
-export function getBody(event) {
-  const body = event.body;
-  const tbody = typeof body;
-  if (tbody == 'string')
-    return JSON.parse(body);
-  if (body instanceof Uint8Array) {    
-    const data = core.parse(body);
-    return core.toJSON(data);
-  }    
-  return body;
-}
-
 export default {
-  dispatchMessage,
-  getBody
+  dispatchMessage 
 }

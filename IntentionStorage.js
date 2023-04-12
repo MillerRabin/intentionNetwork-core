@@ -1,7 +1,7 @@
 import LinkedStorageClient from './LinkedStorageClient.js';
 import IntentionMap from './IntentionMap.js';
 import NetworkIntention from './NetworkIntention.js';
-import dispatcher from './dispatcher.js';
+import messages from './messages.js';
 
 export default class IntentionStorage {
   #id;
@@ -63,7 +63,7 @@ export default class IntentionStorage {
     const { channel } = modules;
     const chn = new channel.Channel(event);
     const storageLink = await this.addStorage({ channel: chn });
-    const body = dispatcher.getBody(event);
+    const body = messages.getBody(event);
     await dispatcher.dispatchMessage(storageLink, body);
     return { message: 'dispatched' };
   }
