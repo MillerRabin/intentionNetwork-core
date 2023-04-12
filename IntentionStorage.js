@@ -1,6 +1,7 @@
 import LinkedStorageClient from './LinkedStorageClient.js';
 import IntentionMap from './IntentionMap.js';
 import NetworkIntention from './NetworkIntention.js';
+import dispatcher from './dispatcher.js';
 
 export default class IntentionStorage {
   #id;
@@ -39,8 +40,7 @@ export default class IntentionStorage {
     return linkedStorage;
   }
 
-  async deleteStorage(id) {
-    console.log('delete storage', this.#id, id);
+  async deleteStorage(id) {    
     await this.#storageInterface.removeLinkedStorage({ storageId: this.#id, id });
   }
 
@@ -60,15 +60,11 @@ export default class IntentionStorage {
   }
 
   async dispatch(modules, event) {
-    const { storage, channel, messages } = modules;
+    const { storage, channel } = modules;
     const chn = new channel.Channel(event);
     const storageLink = await storage.addStorage({ channel: chn });
-    const body = messages.getBody(event);
-    try {
-      await messages.dispatch(storageLink, body);
-    } catch (e) {
-      console.error(e);
-    }        
+    const body = dispatcher.getBody(event);
+    await dispatcher.dispatchMessage(storageLink, body);    
     return { message: 'dispatched' };
   }
 
@@ -80,17 +76,9 @@ export default class IntentionStorage {
       const promises = [...intentions.map(i => storageLink.broadcast(i))];            
       const res = await Promise.allSettled(promises);                
       return res;      
-    } catch (e) {      
-      console.error('broadcast error', e);
+    } catch (e) {
       await this.deleteStorage(connection.id);
       throw e;
     }
-  }
-  async observe(modules) {
-    const conns = await this.#storageInterface.getBroadcastReady({ storageId: this.id });
-    if (conns.length == 0) return;
-    const promises = [...conns.map(c => this.broadcast(modules, c, c.intentions))];
-    return await Promise.allSettled(promises);    
-  }
-
+  }  
 }

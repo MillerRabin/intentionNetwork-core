@@ -18,6 +18,7 @@ const gCommandTable = {
     try {
       const mData = await parseMessage(storageLink, message);
       try {
+        if (message.status == null) throw new Error(`message status can't be null`);
         const result = await mData.intention.send(message.status, mData.target, message.data);
         return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId, result });
       } catch(e) {
@@ -194,8 +195,7 @@ async function parseStatusMessage(storageLink, message) {
 
 async function parseMessage(storageLink, message) {
   const pStatus = await parseStatusMessage(storageLink, message);
-  try {
-    if (message.status == null) pStatus.result.messages.push('message status field must exists');
+  try {    
     if (message.intention == null)
       throw new Error('intention field must exists');
     pStatus.target = await broadcast(storageLink, message.intention);
@@ -204,10 +204,8 @@ async function parseMessage(storageLink, message) {
     return pStatus;
   } catch (e) {
     throwObject(pStatus.result, e.message, e.operation)
-  }
-  
+  }  
 }
-
 
 export async function dispatchMessage(storageLink, data) {
   const key = `${data.version}:${data.command}`;
@@ -218,6 +216,19 @@ export async function dispatchMessage(storageLink, data) {
   return await func(storageLink, data);
 }
 
+export function getBody(event) {
+  const body = event.body;
+  const tbody = typeof body;
+  if (tbody == 'string')
+    return JSON.parse(body);
+  if (body instanceof Uint8Array) {    
+    const data = core.parse(body);
+    return core.toJSON(data);
+  }    
+  return body;
+}
+
 export default {
-  dispatchMessage
+  dispatchMessage,
+  getBody
 }
