@@ -121,7 +121,7 @@ export function getBody(event) {
   if (tbody == 'string')
     return JSON.parse(body);
   if (body instanceof Uint8Array) {    
-    const data = core.parse(body);
+    const data = parse(body);
     return toJSON(data);
   }    
   return body;
