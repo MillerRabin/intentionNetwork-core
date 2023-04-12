@@ -60,11 +60,11 @@ export default class IntentionStorage {
   }
 
   async dispatch(modules, event) {
-    const { storage, channel } = modules;
+    const { channel } = modules;
     const chn = new channel.Channel(event);
-    const storageLink = await storage.addStorage({ channel: chn });
+    const storageLink = await this.addStorage({ channel: chn });
     const body = dispatcher.getBody(event);
-    await dispatcher.dispatchMessage(storageLink, body);    
+    await dispatcher.dispatchMessage(storageLink, body);
     return { message: 'dispatched' };
   }
 
