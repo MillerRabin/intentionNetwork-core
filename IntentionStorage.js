@@ -2,6 +2,7 @@ import LinkedStorageClient from './LinkedStorageClient.js';
 import IntentionMap from './IntentionMap.js';
 import NetworkIntention from './NetworkIntention.js';
 import messages from './messages.js';
+import dispatcher from './dispatcher.js';
 
 export default class IntentionStorage {
   #id;
