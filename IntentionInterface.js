@@ -1,4 +1,4 @@
-import state from "./core/state.js";
+import createPromiseState from "./core/state.js";
 
 async function dispatch(to, from, command, schema, data) {
   const res = await to.send('data', from, {
@@ -10,16 +10,16 @@ async function dispatch(to, from, command, schema, data) {
 
 
 export default class IntentionInterface {
-  #statePromise = state.createPromiseState({ message: 'Interface connection time out'});
+  #statePromise = createPromiseState({ message: 'Interface connection time out'});
   #source;
 
-  async #createIntentions(storage, {
+  #createIntention(storage, {
     title,
     description,
     input,
     output
   }) {
-    this.#source = storage.createIntention({
+    return storage.createIntention({
       title,
       description,
       input,
@@ -45,8 +45,7 @@ export default class IntentionInterface {
       this[key] = async (data) => {
         return await dispatch(to, from, key, vr, data);
       };
-    }
-    return res;
+    }    
   }
 
   static from(storage, {
@@ -64,7 +63,7 @@ export default class IntentionInterface {
     title,
     description
   }) {
-    this.#source = this.#createIntentions(storage, {
+    this.#source = this.#createIntention(storage, {
       input, output, title, description
     })
   }
