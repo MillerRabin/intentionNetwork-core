@@ -1,5 +1,3 @@
-import uuid from "./core/uuid.js";
-
 function allocateBuffer(chunkSize) {
   return new Uint8Array(chunkSize);
 }

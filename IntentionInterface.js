@@ -28,7 +28,9 @@ export default class IntentionInterface {
         if (status == 'accepted') {
           this.#mapValueToInterface(intention, this.#source, value);          
           this.#statePromise.setReady();
-        }    
+        }
+        if (status == 'error')
+          console.error(value)        
       }
     });
   }
@@ -47,13 +49,13 @@ export default class IntentionInterface {
     return res;
   }
 
-  static from({
+  static from(storage, {
     title,
     description,
     input, 
     output
   }) {
-    return new IntentionInterface({title, description, input, output});
+    return new IntentionInterface(storage, {title, description, input, output});
   }
 
   constructor(storage, {
