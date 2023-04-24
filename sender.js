@@ -4,9 +4,20 @@ function allocateBuffer(chunkSize) {
   return new Uint8Array(chunkSize);
 }
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getId() {
+  return new Uint32Array([getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF), getRandomInt(0, 0xFFFFFFFF)]);
+}
+
+
 function setBufferId(buffer) {
   try {
-      const id = uuid.generate();
+      const id = getId();
       const header = new Uint8Array(id.buffer);
       buffer.set(header, 0);
       return id.byteLength;
