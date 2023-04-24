@@ -25,7 +25,7 @@ export default class IntentionInterface {
       input,
       output,
       onData: async (status, intention, value) => {
-        if (status == 'interface') {
+        if (status == 'accepted') {
           this.#mapValueToInterface(intention, this.#source, value);          
           this.#statePromise.setReady();
         }    

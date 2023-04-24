@@ -49,18 +49,18 @@ class IntentionRequest {
     if (request == null) {
       console.error(`request is not found: ${message.requestId}`);
       return;
-    }
-    if (message.status != 'FAILED') {
+    }    
+    if (request.timeout != null)
       clearTimeout(request.timeout);
-      return request.resolve(message.result);      
-    }
-    if (requestTimeout != null)
-      clearTimeout(request.timeout);
+    if (message.status != 'FAILED')      
+      return request.resolve(message.result);          
     return request.reject(message.result);
   }
 
   clear() {
-    for (const [key] of this.#requests) {
+    for (const [key, request] of this.#requests) {      
+      if (request.timeout != null) 
+        clearTimeout(request.timeout);
       this.delete(key);
     }
   }
