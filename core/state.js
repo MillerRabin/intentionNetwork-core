@@ -4,6 +4,7 @@ export default function createPromiseState({
 }) {  
   let setReady;
   let timeout;
+  let cancel;
   const ready = new Promise((resolve, reject) => {
     setReady = resolve;
     cancel = reject;
