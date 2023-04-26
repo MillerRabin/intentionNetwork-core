@@ -30,12 +30,20 @@ export default class IntentionInterface {
           this.#statePromise.setReady();
         }
         if (status == 'error')
-          console.error(value)        
+          this.#statePromise.cancel({ message: 'Interface intention error', value });
+        if (status == 'close')
+          this.#statePromise.cancel({ message: 'Interface intention close', value });
       }
     });
   }
 
-  get ready() { return this.#statePromise.ready }
+  get ready() { 
+    return this.#statePromise.ready.catch((e) => {
+        console.error(e);
+        this.#statePromise = createPromiseState({ message: 'Interface connection time out'});
+      return  this.#statePromise.ready;
+    });
+  }
   
   #mapValueToInterface(to, from, value) {
     if (value == null) throw new Error(`Value can't be null`);      
