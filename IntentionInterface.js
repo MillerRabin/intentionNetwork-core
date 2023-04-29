@@ -15,7 +15,7 @@ export default class IntentionInterface {
   #createStatePromise() {
     if (this.#statePromise != null)
       this.#statePromise.cancel({ message: 'Interface intention error', value });    
-    this.#statePromise = createPromiseState({ message: 'Interface connection time out'});
+    this.#statePromise = this.#createStatePromise({ message: 'Interface connection time out'});
   }
 
   #statePromise = this.#createStatePromise();
@@ -36,7 +36,7 @@ export default class IntentionInterface {
           this.#statePromise.setReady();
         }
         if (status == 'close')
-          this.#createPromiseState();
+          this.#createStatePromise();
       }
     });
   }
