@@ -1,6 +1,6 @@
 {
   "name": "@intention-network/core",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "Intention Network core",
   "main": "main.js",
   "type": "module",
