@@ -12,13 +12,14 @@ async function dispatch(to, from, command, schema, data) {
 export default class IntentionInterface {  
   #source;
 
+  #statePromise;
+  
   #createStatePromise() {
     if (this.#statePromise != null)
       this.#statePromise.cancel({ message: 'Interface intention error', value });    
     this.#statePromise = this.#createStatePromise({ message: 'Interface connection time out'});
   }
-
-  #statePromise = this.#createStatePromise();
+  
   #createIntention(storage, {
     title,
     description,
@@ -75,6 +76,7 @@ export default class IntentionInterface {
     title,
     description
   }) {
+    this.#statePromise = this.#createStatePromise();
     this.#source = this.#createIntention(storage, {
       input, output, title, description
     })
