@@ -21,6 +21,7 @@ const gCommandTable = {
         const result = await mData.intention.send(message.status, mData.target, message.data);
         return await sendStatus({ storageLink, status: 'OK', requestId: mData.result.requestId, result });
       } catch(e) {
+        console.log('message error', e);
         throwObject(mData.result, e.message);
       }      
     } catch (e) {            
@@ -116,7 +117,8 @@ const gCommandTable = {
   }
 };
 
-async function parseError(storageLink, e) {  
+async function parseError(storageLink, e) { 
+  console.log('parse error', e); 
   await sendStatus({ storageLink, status: 'FAILED', requestId: e.requestId, result: e }).catch(() => {});
   throw e;
 }
