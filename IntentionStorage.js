@@ -72,12 +72,14 @@ export default class IntentionStorage {
   async broadcast(modules, connection, intentions) {
     const { channel, storage } = modules;    
     try {
+      await channel.Channel.getConnection(connection.id,  connection.endpoint);
       const chn = new channel.Channel({ requestContext: { endpoint: connection.endpoint }}, connection.id, storage);      
       const storageLink = this.#createLinkedStorage({ channel: chn });
       const promises = [...intentions.map(i => storageLink.broadcast(i))];            
       const res = await Promise.allSettled(promises);                
       return res;      
     } catch (e) {
+      console.log('broadcast', e);
       await this.deleteStorage(connection.id);
       throw e;
     }
