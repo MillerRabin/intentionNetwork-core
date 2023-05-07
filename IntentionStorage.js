@@ -86,7 +86,7 @@ export default class IntentionStorage {
   }
   
   async observe(modules) {
-    const conns = await this.#storageInterface.getBroadcastReady({ storageId: this.id });
+    const conns = await this.#storageInterface.getBroadcastReady(modules, this.id );
     if (conns.length == 0) return;
     const promises = [...conns.map(c => this.broadcast(modules, c, c.intentions))];
     return await Promise.allSettled(promises);    
